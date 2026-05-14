@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KASUMIN</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; background: #f4f1ec; overflow: hidden; }
+.stage { width: 100vw; height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; }
+canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.name-wrap {
+  position: relative; z-index: 20; text-align: center;
+  opacity: 0; animation: riseIn 1.2s cubic-bezier(0.22,1,0.36,1) forwards 0.5s;
+}
+.name {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 400;
+  font-size: clamp(3.2rem, 8vw, 6.8rem);
+  letter-spacing: 0.32em;
+  color: #1e1a16;
+  line-height: 1;
+  padding-right: 0.32em;
+}
+@keyframes riseIn { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+</style>
+</head>
+<body>
+<div class="stage">
+  <canvas id="c"></canvas>
+  <div class="name-wrap"><div class="name">KASUMIN</div></div>
+</div>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H, stems = [], flowers = [];
+
+function rand(a, b) { return a + Math.random() * (b - a); }
+function randInt(a, b) { return Math.floor(rand(a, b + 1)); }
+
+const BG = '#f4f1ec';
+const STEM_C = ['#b0a494','#a89888','#bdb0a2','#c2b4a6','#a8998a'];
+const PETAL_C = ['#ede7e0','#e2d9cf','#f0ebe5','#d9cfc4','#e8e0d6','#f2ede8','#ddd4c8'];
+
+function inCenter(x, y) {
+  const cx = W / 2, cy = H / 2;
+  return Math.abs(x - cx) < W * 0.30 && Math.abs(y - cy) < H * 0.24;
+}
+
+function makeBranchAcc(x, y, angle, length, depth, maxDepth, sAcc, fAcc) {
+  if (depth > maxDepth || length < 4) return false;
+  const ex = x + Math.cos(angle) * length;
+  const ey = y + Math.sin(angle) * length;
+  let hasFlower = false;
+  const cs = [], cf = [];
+
+  if (depth >= maxDepth) {
+    if (!inCenter(ex, ey)) {
+      const count = randInt(5, 10);
+      for (let f = 0; f < count; f++) {
+        const fx = ex + rand(-8, 8), fy = ey + rand(-8, 8);
+        if (!inCenter(fx, fy)) { cf.push({ x: fx, y: fy, r: rand(3.0, 6.0) }); hasFlower = true; }
+      }
+    }
+  } else {
+    for (let i = 0; i < randInt(2, 4); i++) {
+      const a2 = angle + rand(-0.58, 0.58);
+      const l2 = length * rand(0.54, 0.76);
+      const cs2 = [], cf2 = [];
+      if (makeBranchAcc(ex, ey, a2, l2, depth + 1, maxDepth, cs2, cf2)) {
+        cs.push(...cs2); cf.push(...cf2); hasFlower = true;
+      }
+    }
+    if (depth >= maxDepth - 1 && !inCenter(ex, ey) && hasFlower) {
+      for (let e = 0; e < randInt(2, 5); e++) {
+        const fx = ex + rand(-10, 10), fy = ey + rand(-10, 10);
+        if (!inCenter(fx, fy)) cf.push({ x: fx, y: fy, r: rand(2.5, 5.0) });
+      }
+    }
+  }
+
+  if (hasFlower) {
+    const w = Math.max(0.3, 1.8 - (depth / maxDepth) * 1.4);
+    cs.unshift({ x1: x, y1: y, x2: ex, y2: ey,
+      mx: (x+ex)/2 + rand(-5,5), my: (y+ey)/2 + rand(-5,5),
+      w, col: STEM_C[randInt(0, STEM_C.length-1)] });
+    sAcc.push(...cs); fAcc.push(...cf);
+  }
+  return hasFlower;
+}
+
+function init() {
+  stems = []; flowers = [];
+
+  [
+    [rand(-35,20),  H+5, rand(-1.55,-1.05), rand(H*.55,H*.68)],
+    [rand(-10,60),  H+5, rand(-1.62,-1.18), rand(H*.48,H*.60)],
+    [rand(10,90),   H+5, rand(-1.72,-1.28), rand(H*.40,H*.52)],
+    [rand(-45,10),  H+5, rand(-1.42,-0.95), rand(H*.50,H*.62)],
+    [rand(30,110),  H+5, rand(-1.68,-1.32), rand(H*.36,H*.50)],
+    [rand(-20,50),  H+5, rand(-1.58,-1.12), rand(H*.44,H*.56)],
+  ].forEach(([x,y,a,l]) => makeBranchAcc(x,y,a,l,0,randInt(5,7),stems,flowers));
+
+  [
+    [W+rand(0,35),   H+5, rand(-2.14,-1.58), rand(H*.52,H*.66)],
+    [W+rand(-25,18), H+5, rand(-2.08,-1.52), rand(H*.44,H*.58)],
+    [W-rand(5,65),   H+5, rand(-2.22,-1.72), rand(H*.38,H*.52)],
+    [W+rand(8,48),   H+5, rand(-1.98,-1.42), rand(H*.46,H*.60)],
+    [W-rand(40,100), H+5, rand(-2.18,-1.65), rand(H*.34,H*.48)],
+    [W+rand(-10,30), H+5, rand(-2.05,-1.55), rand(H*.40,H*.54)],
+  ].forEach(([x,y,a,l]) => makeBranchAcc(x,y,a,l,0,randInt(5,7),stems,flowers));
+
+  [
+    [rand(W*.05,W*.28), -5, rand(1.0,1.55),  rand(H*.22,H*.34)],
+    [rand(W*.72,W*.95), -5, rand(1.6,2.15),  rand(H*.20,H*.32)],
+    [rand(W*.12,W*.30), -5, rand(1.1,1.65),  rand(H*.18,H*.28)],
+    [rand(W*.70,W*.88), -5, rand(1.5,2.05),  rand(H*.18,H*.28)],
+  ].forEach(([x,y,a,l]) => makeBranchAcc(x,y,a,l,0,randInt(4,6),stems,flowers));
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+
+  stems.forEach(s => {
+    ctx.beginPath();
+    ctx.moveTo(s.x1, s.y1);
+    ctx.quadraticCurveTo(s.mx, s.my, s.x2, s.y2);
+    ctx.strokeStyle = s.col;
+    ctx.lineWidth = s.w;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+  });
+
+  flowers.forEach(f => {
+    const p1 = PETAL_C[randInt(0, PETAL_C.length-1)];
+    const p2 = PETAL_C[randInt(0, PETAL_C.length-1)];
+    const offset = rand(0, Math.PI * 2);
+    for (let p = 0; p < 5; p++) {
+      const pa = offset + (p / 5) * Math.PI * 2;
+      const px = f.x + Math.cos(pa) * f.r * 0.74;
+      const py = f.y + Math.sin(pa) * f.r * 0.74;
+      ctx.beginPath();
+      ctx.ellipse(px, py, f.r * 0.62, f.r * 0.58, pa, 0, Math.PI * 2);
+      ctx.fillStyle = p % 2 === 0 ? p1 : p2;
+      ctx.fill();
+    }
+    ctx.beginPath();
+    ctx.arc(f.x, f.y, f.r * 0.66, 0, Math.PI * 2);
+    ctx.fillStyle = p1; ctx.fill();
+    ctx.beginPath();
+    ctx.arc(f.x, f.y, f.r * 0.22, 0, Math.PI * 2);
+    ctx.fillStyle = '#c4ad96'; ctx.fill();
+  });
+}
+
+function resize() {
+  W = canvas.width = canvas.offsetWidth;
+  H = canvas.height = canvas.offsetHeight;
+  init(); draw();
+}
+
+window.addEventListener('resize', resize);
+resize();
+</script>
+</body>
+</html>
