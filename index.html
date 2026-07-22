@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KASUMIN</title>
+<title>KASUMIN STUDIO</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width: 100%; height: 100%; background: #f4f1ec; overflow: hidden; }
+html, body { width: 100%; height: 100%; background: #fbfaf8; overflow: hidden; }
 .stage { width: 100vw; height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; }
 canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .name-wrap {
@@ -17,11 +17,21 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .name {
   font-family: 'Cormorant Garamond', serif;
   font-weight: 400;
-  font-size: clamp(3.2rem, 8vw, 6.8rem);
+  font-size: clamp(2rem, 5vw, 4.2rem);
   letter-spacing: 0.32em;
   color: #1e1a16;
   line-height: 1;
   padding-right: 0.32em;
+}
+.studio {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 400;
+  font-size: clamp(0.9rem, 1.7vw, 1.2rem);
+  letter-spacing: 0.5em;
+  color: #7a6f61;
+  line-height: 1;
+  margin-top: 0.55em;
+  padding-right: 0.5em;
 }
 @keyframes riseIn { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
 </style>
@@ -29,7 +39,7 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 <body>
 <div class="stage">
   <canvas id="c"></canvas>
-  <div class="name-wrap"><div class="name">KASUMIN</div></div>
+  <div class="name-wrap"><div class="name">KASUMIN</div><div class="studio">STUDIO</div></div>
 </div>
 <script>
 const canvas = document.getElementById('c');
@@ -39,9 +49,9 @@ let W, H, stems = [], flowers = [];
 function rand(a, b) { return a + Math.random() * (b - a); }
 function randInt(a, b) { return Math.floor(rand(a, b + 1)); }
 
-const BG = '#f4f1ec';
-const STEM_C = ['#b0a494','#a89888','#bdb0a2','#c2b4a6','#a8998a'];
-const PETAL_C = ['#ede7e0','#e2d9cf','#f0ebe5','#d9cfc4','#e8e0d6','#f2ede8','#ddd4c8'];
+const BG = '#fbfaf8';
+const STEM_C = ['#9aa08c','#8d9680','#a5ab97','#93a186','#8a9578'];
+const PETAL_C = ['#ffffff','#faf8f5','#f6f4f0','#fdfcfa','#f2f0ec','#fbfaf7','#f0eee9'];
 
 function inCenter(x, y) {
   const cx = W / 2, cy = H / 2;
@@ -60,7 +70,7 @@ function makeBranchAcc(x, y, angle, length, depth, maxDepth, sAcc, fAcc) {
       const count = randInt(5, 10);
       for (let f = 0; f < count; f++) {
         const fx = ex + rand(-8, 8), fy = ey + rand(-8, 8);
-        if (!inCenter(fx, fy)) { cf.push({ x: fx, y: fy, r: rand(3.0, 6.0) }); hasFlower = true; }
+        if (!inCenter(fx, fy)) { cf.push({ x: fx, y: fy, r: rand(4.5, 8.5) }); hasFlower = true; }
       }
     }
   } else {
@@ -75,7 +85,7 @@ function makeBranchAcc(x, y, angle, length, depth, maxDepth, sAcc, fAcc) {
     if (depth >= maxDepth - 1 && !inCenter(ex, ey) && hasFlower) {
       for (let e = 0; e < randInt(2, 5); e++) {
         const fx = ex + rand(-10, 10), fy = ey + rand(-10, 10);
-        if (!inCenter(fx, fy)) cf.push({ x: fx, y: fy, r: rand(2.5, 5.0) });
+        if (!inCenter(fx, fy)) cf.push({ x: fx, y: fy, r: rand(4.0, 7.5) });
       }
     }
   }
@@ -145,6 +155,9 @@ function draw() {
       ctx.ellipse(px, py, f.r * 0.62, f.r * 0.58, pa, 0, Math.PI * 2);
       ctx.fillStyle = p % 2 === 0 ? p1 : p2;
       ctx.fill();
+      ctx.strokeStyle = 'rgba(154,160,140,0.30)';
+      ctx.lineWidth = 0.6;
+      ctx.stroke();
     }
     ctx.beginPath();
     ctx.arc(f.x, f.y, f.r * 0.66, 0, Math.PI * 2);
