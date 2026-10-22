@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sanitary Gallery</title>
+<title>Dental Clinic Gallery</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400&display=swap" rel="stylesheet">
@@ -80,7 +80,7 @@
   /* ---- サムネイル ---- */
   .thumbs {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 10px;
   }
   .thumb {
@@ -132,11 +132,12 @@
 <script>
 // 表示順・ファイル名・ラベルはここだけ編集すればOK
 var ITEMS = [
-  { src: 'concept.jpg',      thumb: 'concept_s.jpg',      label: 'Concept  方向性' },
-  { src: 'element.jpg',      thumb: 'element_s.jpg',      label: 'Design Point  要素' },
-  { src: 'plan.jpg',         thumb: 'plan_s.jpg',         label: 'Planning  平面プラン・ゾーニング' },
-  { src: 'perspective.jpg',  thumb: 'perspective_s.jpg',  label: 'Perspective  パース' },
-  { src: 'material.jpg',     thumb: 'material_s.jpg',     label: 'Material Image  素材イメージ' }
+  { src: 'concept.jpg',  thumb: 'concept_s.jpg',  label: 'Concept  方向性' },
+  { src: 'element.jpg',  thumb: 'element_s.jpg',  label: 'Design Point  要素' },
+  { src: 'plan.jpg',     thumb: 'plan_s.jpg',     label: 'Planning  平面プラン・ゾーニング' },
+  { src: 'waiting.jpg',  thumb: 'waiting_s.jpg',  label: 'Perspective  待合室' },
+  { src: 'clinic.jpg',   thumb: 'clinic_s.jpg',   label: 'Perspective  診療室' },
+  { src: 'material.jpg', thumb: 'material_s.jpg', label: 'Material Image  素材イメージ' }
 ];
 
 var stage  = document.getElementById('stage');
